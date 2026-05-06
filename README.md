@@ -5,7 +5,7 @@ This project is a data-driven Student Performance Early Warning System that anal
 
 ---
 
-##🎯 Objectives
+## Objectives
 - To analyze student performance using structured datasets
 - To apply rule-based and machine learning classification techniques
 - To identify students at risk of academic failure
