@@ -1,4 +1,4 @@
-# Design and Development of a Big Data Analytics Early Warning System Dashboard for Student Performance and At-Risk Student Detection Student Performance Early Warning System
+# Design and Development of a Big Data Analytics Early Warning System Dashboard for Student Performance and At-Risk Student Detection 
 
 ## Project Overview
 This project is a data-driven Student Performance Early Warning System that analyzes student academic behavior and predicts performance levels using rule-based classification and machine learning. It identifies at-risk students based on key indicators such as absences, class failures, and study time. The system integrates Python for data processing, PostgreSQL and MongoDB for data storage, FastAPI for API access, and Power BI for data visualization and reporting.
