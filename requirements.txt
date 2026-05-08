@@ -1,7 +1,4 @@
 pandas
-fastapi
-uvicorn
 sqlalchemy
 psycopg2-binary
 pymongo
-scikit-learn
