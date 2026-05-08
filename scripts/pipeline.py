@@ -2,17 +2,15 @@ import pandas as pd
 from sqlalchemy import create_engine
 from pymongo import MongoClient
 
-# ML imports
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
-
 # ---------------- LOAD DATA ----------------
 df = pd.read_csv("../data/students.csv")
 
+print("✔ Data loaded")
+
 # ---------------- CLEAN DATA ----------------
 df.dropna(inplace=True)
+
+print("✔ Missing values removed")
 
 # ---------------- RULE-BASED CLASSIFICATION ----------------
 def classify(row):
@@ -25,58 +23,42 @@ def classify(row):
 
 df["Performance_Level"] = df.apply(classify, axis=1)
 
-print("✔ Rule-based classification done")
+print("✔ Rule-based classification completed")
 
-# ---------------- MACHINE LEARNING SECTION ----------------
+# ---------------- PROPOSED ML MODELS (NO TRAINING) ----------------
+print("\n📌 Proposed Machine Learning Models for Future Implementation:")
+print("1. Decision Tree Classifier - interpretable, matches rule-based logic")
+print("2. Random Forest Classifier - higher accuracy, handles noisy data")
+print("3. Logistic Regression - baseline classification model")
 
-df_ml = df.copy()
+# ---------------- POSTGRESQL STORAGE ----------------
+try:
+    engine = create_engine(
+        "postgresql://postgres:admin123@localhost:5432/student_performance"
+    )
 
-# Encode categorical data
-le = LabelEncoder()
+    df.to_sql("students", engine, if_exists="replace", index=False)
+    print("✔ Data saved to PostgreSQL")
 
-df_ml["sex"] = le.fit_transform(df_ml["sex"])
-df_ml["school"] = le.fit_transform(df_ml["school"])
-df_ml["address_type"] = le.fit_transform(df_ml["address_type"])
+except Exception as e:
+    print("❌ PostgreSQL Error:", e)
 
-# Features and target
-X = df_ml[["age", "absences", "class_failures", "sex"]]
-y = df_ml["Performance_Level"]
+# ---------------- MONGODB STORAGE ----------------
+try:
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client["student_bigdata"]
+    collection = db["students"]
 
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+    collection.delete_many({})
+    collection.insert_many(df.to_dict(orient="records"))
 
-# Train model
-model = DecisionTreeClassifier()
-model.fit(X_train, y_train)
+    print("✔ Data saved to MongoDB")
 
-# Predict
-y_pred = model.predict(X_test)
-
-# Accuracy
-accuracy = accuracy_score(y_test, y_pred)
-print("✔ ML Model Accuracy:", accuracy)
-
-# ---------------- POSTGRESQL ----------------
-engine = create_engine(
-    "postgresql://postgres:admin123@localhost:5432/student_performance"
-)
-
-df.to_sql("students", engine, if_exists="replace", index=False)
-
-print("✔ Data saved to PostgreSQL")
-
-# ---------------- MONGODB ----------------
-client = MongoClient("mongodb://localhost:27017/")
-db = client["student_bigdata"]
-collection = db["students"]
-
-collection.delete_many({})
-collection.insert_many(df.to_dict(orient="records"))
-
-print("✔ Data saved to MongoDB")
+except Exception as e:
+    print("❌ MongoDB Error:", e)
 
 # ---------------- FINAL OUTPUT ----------------
 print("\n📊 Performance Distribution:")
 print(df["Performance_Level"].value_counts().to_string())
+
+print("\n✔ Pipeline completed successfully")
